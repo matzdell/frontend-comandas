@@ -13,13 +13,8 @@ export default function Login() {
     setErr('');
 
     try {
-      // login llama a /api/auth/login y devuelve el usuario + token
-      const user = await login(form.email, form.password); // { id, email, role, token, ... }
-
-      // 👇 guardar el token para que apiFetch lo mande como Bearer
-      if (user?.token) {
-        localStorage.setItem('token', user.token);
-      }
+      // login ya guarda token + user en localStorage y en el contexto
+      const user = await login(form.email, form.password); // { id, email, role, nombre }
 
       const rol = user.role;
 
