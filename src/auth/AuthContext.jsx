@@ -15,21 +15,32 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState("checking"); // 'checking' | 'authed' | 'guest'
 
-  // Al montar la app, intenta leer /api/auth/me (cookie httpOnly)
+  // Al montar la app, intentamos validar el token guardado en localStorage
   useEffect(() => {
     async function cargarUsuario() {
       try {
-        const data = await apiFetch("/api/auth/me");
+        const token = localStorage.getItem("token");
+        if (!token) {
+          // No hay token -> invitado
+          setUser(null);
+          setStatus("guest");
+          return;
+        }
 
-        if (data) {
-          setUser(data);
+        // /api/auth/me ahora usa authRequired (cookie o Bearer)
+        const data = await apiFetch("/api/auth/me");
+        // Esperamos { ok: true, user }
+        if (data?.ok && data.user) {
+          setUser(data.user);
           setStatus("authed");
         } else {
+          localStorage.removeItem("token");
           setUser(null);
           setStatus("guest");
         }
       } catch (err) {
         console.error("Error cargando /api/auth/me:", err);
+        localStorage.removeItem("token");
         setUser(null);
         setStatus("guest");
       }
@@ -44,8 +55,21 @@ export function AuthProvider({ children }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    // el backend devuelve el payload (id, email, role, nombre, token, user, etc.)
-    setUser(data);
+    // el backend devuelve: { ok, token, id, email, role, nombre, user }
+    if (data?.token) {
+      localStorage.setItem("token", data.token);
+    }
+
+    // preferimos data.user (payload limpio)
+    const u =
+      data.user || {
+        id: data.id,
+        email: data.email,
+        role: data.role,
+        nombre: data.nombre,
+      };
+
+    setUser(u);
     setStatus("authed");
     return data;
   }
@@ -57,6 +81,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.warn("Error en logout:", err);
     }
+    localStorage.removeItem("token");
     setUser(null);
     setStatus("guest");
   }
@@ -64,7 +89,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     status,
-    isAuthenticated: !!user,
+    isAuthenticated: status === "authed",
     login,
     logout,
   };
@@ -81,5 +106,4 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-// Export default (por si en algún lado lo usas así)
 export default AuthContext;
