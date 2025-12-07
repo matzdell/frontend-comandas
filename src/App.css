@@ -1,0 +1,171 @@
+/* ===== GENERAL LAYOUT ===== */
+.kds-container {
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  background: #f3f4f6;
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.kds-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 15px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+}
+
+.kds-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.kds-sub {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.btn-reload {
+  background: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-reload:hover {
+  background: #1d4ed8;
+}
+
+/* ===== GRID ===== */
+.kds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
+}
+
+/* ===== CARD COMANDA ===== */
+.kds-card {
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Header ---- */
+.kds-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.kds-mesa {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.kds-count {
+  background: #e5e7eb;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---- Items ---- */
+.kds-items {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 15px 0;
+}
+
+.kds-items li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 15px;
+}
+
+.kds-items li:last-child {
+  border-bottom: none;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.kds-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.kds-actions button {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.kds-actions button:hover {
+  background: #1d4ed8;
+}
+
+.kds-actions button:nth-child(2) {
+  background: #f59e0b;
+}
+
+.kds-actions button:nth-child(2):hover {
+  background: #d97706;
+}
+
+.kds-actions button:nth-child(3) {
+  background: #ef4444;
+}
+
+.kds-actions button:nth-child(3):hover {
+  background: #dc2626;
+}
+
+/* ===== BADGES Y ESTADO ===== */
+.kds-estado {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.kds-preparando {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.kds-terminado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.kds-tiempo {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 8px;
+}
