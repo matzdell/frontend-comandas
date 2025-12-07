@@ -7,46 +7,33 @@ import React, {
 } from "react";
 import { apiFetch } from "../api";
 
-// Creamos el contexto
 const AuthContext = createContext(null);
 
-// Proveedor de autenticación
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState("checking"); // 'checking' | 'authed' | 'guest'
 
-  // Al montar la app, intentamos validar el token guardado en localStorage
+  // Al montar la app, leer token + user desde localStorage
   useEffect(() => {
-    async function cargarUsuario() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          // No hay token -> invitado
-          setUser(null);
-          setStatus("guest");
-          return;
-        }
+    try {
+      const token = localStorage.getItem("token");
+      const rawUser = localStorage.getItem("user");
 
-        // /api/auth/me ahora usa authRequired (cookie o Bearer)
-        const data = await apiFetch("/api/auth/me");
-        // Esperamos { ok: true, user }
-        if (data?.ok && data.user) {
-          setUser(data.user);
-          setStatus("authed");
-        } else {
-          localStorage.removeItem("token");
-          setUser(null);
-          setStatus("guest");
-        }
-      } catch (err) {
-        console.error("Error cargando /api/auth/me:", err);
-        localStorage.removeItem("token");
+      if (token && rawUser) {
+        const parsedUser = JSON.parse(rawUser);
+        setUser(parsedUser);
+        setStatus("authed");
+      } else {
         setUser(null);
         setStatus("guest");
       }
+    } catch (err) {
+      console.error("Error leyendo localStorage:", err);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      setStatus("guest");
     }
-
-    cargarUsuario();
   }, []);
 
   // Login para el panel web
@@ -55,12 +42,8 @@ export function AuthProvider({ children }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    // el backend devuelve: { ok, token, id, email, role, nombre, user }
-    if (data?.token) {
-      localStorage.setItem("token", data.token);
-    }
-
-    // preferimos data.user (payload limpio)
+    // backend devuelve: { ok, token, id, email, role, nombre, user }
+    const token = data.token;
     const u =
       data.user || {
         id: data.id,
@@ -69,19 +52,25 @@ export function AuthProvider({ children }) {
         nombre: data.nombre,
       };
 
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    localStorage.setItem("user", JSON.stringify(u));
+
     setUser(u);
     setStatus("authed");
-    return data;
+    return u; // o data, según lo que uses en Login.jsx
   }
 
-  // Logout
   async function logout() {
     try {
+      // opcional, no afecta a la sesión en front
       await apiFetch("/api/auth/logout", { method: "POST" });
     } catch (err) {
       console.warn("Error en logout:", err);
     }
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
     setStatus("guest");
   }
@@ -101,7 +90,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Hook para consumir el contexto
 export function useAuth() {
   return useContext(AuthContext);
 }
